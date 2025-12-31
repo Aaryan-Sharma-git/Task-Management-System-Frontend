@@ -1,73 +1,105 @@
-# React + TypeScript + Vite
+# Task Management System Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend application for the Task Management System, built with React and Vite. It provides a user interface for managing tasks, user authentication, and dashboard views.
 
-Currently, two official plugins are available:
+## Table of Contents
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Environment Variables](#environment-variables)
+- [Running in Development](#running-in-development)
+- [Running in Production](#running-in-production)
+- [Pages](#pages)
+- [Components](#components)
+- [Routes](#routes)
+- [Testing](#testing)
+- [Deployment](#deployment)
 
-## React Compiler
+## Prerequisites
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Node.js (v16 or higher)
+- npm or yarn
 
-## Expanding the ESLint configuration
+## Installation
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1. Clone the repository and navigate to the frontend directory:
+   ```
+   cd c:\Users\HP\OneDrive\Desktop\Task Management System\frontend
+   ```
+2. Install dependencies:
+   ```
+   npm install
+   ```
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Environment Variables
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Create a `.env` file in the frontend root with the following sample format:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+VITE_API_URL=http://localhost:5000
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Running in Development
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. Ensure the backend is running (e.g., on `http://localhost:5000`).
+2. Start the development server:
+   ```
+   npm run dev
+   ```
+   The app will run on `http://localhost:5173` (default Vite port).
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Running in Production
+
+1. Build the application:
+   ```
+   npm run build
+   ```
+2. Preview the build locally:
+   ```
+   npm run preview
+   ```
+   For production deployment, serve the `dist` folder using a static server like Nginx, or deploy to platforms like Vercel, Netlify, or AWS S3.
+
+## Pages
+
+- **Login Page**: User authentication form.
+- **Register Page**: New user registration form.
+- **Dashboard Page**: Overview of tasks and user stats.
+- **Task List Page**: Displays all tasks with filters.
+- **Task Detail Page**: View/edit individual task.
+- **Profile Page**: User profile management.
+
+## Components
+
+- **Header**: Navigation bar with logout.
+- **TaskCard**: Displays task summary.
+- **TaskForm**: Form for creating/editing tasks.
+- **Sidebar**: Menu for navigation.
+- **Modal**: Reusable modal for confirmations.
+- **Button**: Custom button component.
+- **Input**: Custom input field.
+
+## Routes
+
+- `/` - Redirects to `/dashboard` if authenticated, else `/login`.
+- `/login` - Login page.
+- `/register` - Register page.
+- `/dashboard` - Main dashboard.
+- `/tasks` - Task list.
+- `/tasks/:id` - Task detail.
+- `/profile` - User profile.
+
+Routes are protected with authentication guards where necessary.
+
+## Testing
+
+Run tests with:
+
 ```
+npm test
+```
+
+## Deployment
+
+- Use Vercel/Netlify for easy deployment: Connect your Git repo and set environment variables.
+- For custom servers: Upload the `dist` folder to your hosting provider.
