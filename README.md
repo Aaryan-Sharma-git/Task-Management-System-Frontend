@@ -64,40 +64,27 @@ VITE_API_URL=http://localhost:5000
 
 - **Login Page**: User authentication form.
 - **Register Page**: New user registration form.
-- **Dashboard Page**: Overview of tasks and user stats.
-- **Task List Page**: Displays all tasks with filters.
-- **Task Detail Page**: View/edit individual task.
-- **Profile Page**: User profile management.
+- **Priority Tasks Page**: Displays tasks filtered by priority (high, medium, low).
+- **Create Task Page**: Form for creating new tasks.
+- **Task Details Page**: View/edit individual task.
 
 ## Components
 
-- **Header**: Navigation bar with logout.
+- **AuthWrapper**: Wraps authenticated routes with authentication logic.
+- **SideBar**: Menu for navigation.
 - **TaskCard**: Displays task summary.
-- **TaskForm**: Form for creating/editing tasks.
-- **Sidebar**: Menu for navigation.
-- **Modal**: Reusable modal for confirmations.
-- **Button**: Custom button component.
-- **Input**: Custom input field.
 
 ## Routes
 
-- `/` - Redirects to `/dashboard` if authenticated, else `/login`.
+- `/` - High priority tasks (default authenticated view).
+- `/tasks/medium` - Medium priority tasks.
+- `/tasks/low` - Low priority tasks.
+- `/tasks/create` - Create new task page.
+- `/task/:id` - Task details page.
 - `/login` - Login page.
 - `/register` - Register page.
-- `/dashboard` - Main dashboard.
-- `/tasks` - Task list.
-- `/tasks/:id` - Task detail.
-- `/profile` - User profile.
 
 Routes are protected with authentication guards where necessary.
-
-## Testing
-
-Run tests with:
-
-```
-npm test
-```
 
 ## Deployment
 
