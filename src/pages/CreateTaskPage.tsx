@@ -1,41 +1,71 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { createTask, getAllUsers } from "../api/taskApi";
-import type { TaskPriority, User } from "../interfaces/taskInterface";
 import { ArrowLeft } from "lucide-react";
+
+import {
+  createTask,
+  getAllUsers,
+  assignTask,
+} from "../api/taskApi";
+
+import type { TaskPriority, User } from "../interfaces/taskInterface";
+import useAuth from "../hooks/useAuth";
 
 const CreateTaskPage = () => {
   const navigate = useNavigate();
+  const { user: currentUser } = useAuth(); // 👈 logged-in user
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
-  const [priority, setPriority] = useState<TaskPriority>("medium");
+  const [priority, setPriority] =
+    useState<TaskPriority>("medium");
   const [assignedTo, setAssignedTo] = useState("");
 
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // ✅ Fetch users & REMOVE owner from assign list
   useEffect(() => {
     const fetchUsers = async () => {
-      const data = await getAllUsers();
-      setUsers(data);
+      try {
+        const data = await getAllUsers();
+
+        const filteredUsers = data.filter(
+          (user: User) => user._id !== currentUser?._id
+        );
+
+        setUsers(filteredUsers);
+      } catch (err) {
+        console.error("Failed to fetch users");
+      }
     };
-    fetchUsers();
-  }, []);
+
+    if (currentUser) {
+      fetchUsers();
+    }
+  }, [currentUser]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      await createTask({
+      // 1️⃣ Create task WITHOUT assignment
+      const createdTask = await createTask({
         title,
         description,
         dueDate,
         priority,
-        assignedTo: assignedTo || undefined,
       });
+
+
+      // 2️⃣ Assign task ONLY if user selected
+      if (assignedTo) {
+        await assignTask(createdTask.task._id, assignedTo);
+      }
+
+      // 3️⃣ Go back
       navigate(-1);
     } catch (err) {
       console.error("Failed to create task");
@@ -46,7 +76,6 @@ const CreateTaskPage = () => {
 
   return (
     <div className="w-full">
-
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <button
@@ -65,7 +94,6 @@ const CreateTaskPage = () => {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-
           {/* Title */}
           <div>
             <label className="block text-sm font-medium mb-1">
@@ -126,7 +154,7 @@ const CreateTaskPage = () => {
             </select>
           </div>
 
-          {/* Assign User */}
+          {/* ✅ Assign User (Owner excluded) */}
           <div>
             <label className="block text-sm font-medium mb-1">
               Assign To
@@ -149,7 +177,7 @@ const CreateTaskPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-md font-medium"
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-md font-medium disabled:opacity-60"
           >
             {loading ? "Creating..." : "Create Task"}
           </button>

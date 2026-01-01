@@ -36,6 +36,7 @@ export const createTask = async (
   payload: CreateTaskPayload
 ) => {
   const response = await api.post("/task", payload);
+  console.log(response.data);
   return response.data;
 };
 
@@ -62,6 +63,15 @@ export const deleteTask = async (taskId: string) => {
   const response = await api.delete(`/task/${taskId}`);
   return response.data;
 };
+
+export const assignTask = async (taskId: string, userId: string) => {
+  console.log(taskId);
+  const res = await api.patch(`/task/${taskId}/assign`, {
+    userId,
+  });
+  return res.data.task;
+};
+
 
 
 

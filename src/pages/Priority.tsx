@@ -1,16 +1,17 @@
 import { useNavigate } from "react-router-dom";
 import TaskCard from "../components/TaskCard";
 import type { Task, TaskPriority } from "../interfaces/taskInterface";
-import { useEffect, useState } from "react";
-import { getTasksByPriority } from "../api/taskApi";
-import { updateTaskStatus } from "../api/taskApi";
+import { useEffect, useState, useCallback } from "react";
+import {
+  getTasksByPriority,
+  updateTaskStatus,
+} from "../api/taskApi";
 import useAuth from "../hooks/useAuth";
-
 
 const PriorityTasksPage = ({ priority }: { priority: TaskPriority }) => {
   const navigate = useNavigate();
-
   const { user } = useAuth();
+
   if (!user) return null;
 
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -18,33 +19,53 @@ const PriorityTasksPage = ({ priority }: { priority: TaskPriority }) => {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
 
+  // ✅ Centralized fetch function
+  const fetchTasks = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await getTasksByPriority(priority, page);
+      setTasks(data.tasks);
+      setTotalPages(data.totalPages);
+    } catch (err) {
+      console.error("Failed to fetch tasks", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [priority, page]);
+
+  // ✅ Initial + pagination fetch
+  useEffect(() => {
+    fetchTasks();
+  }, [fetchTasks]);
+
   const handleToggleStatus = async (taskId: string) => {
-    // 1️⃣ Find the current task
     const currentTask = tasks.find((task) => task._id === taskId);
     if (!currentTask) return;
 
-    // 2️⃣ Decide next status FIRST
     const nextStatus =
       currentTask.status === "pending" ? "completed" : "pending";
 
-    // 3️⃣ Optimistic UI update
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
+    // 1️⃣ Optimistic update (instant UX)
+    setTasks((prev) =>
+      prev.map((task) =>
         task._id === taskId
           ? { ...task, status: nextStatus }
           : task
       )
     );
 
-    // 4️⃣ Call backend with correct status
     try {
+      // 2️⃣ Backend update
       await updateTaskStatus(taskId, nextStatus);
+
+      // 3️⃣ 🔥 REFRESH FROM BACKEND
+      await fetchTasks();
     } catch (error) {
       console.error("Failed to update task status");
 
-      // 5️⃣ Rollback UI on failure
-      setTasks((prevTasks) =>
-        prevTasks.map((task) =>
+      // 4️⃣ Rollback UI
+      setTasks((prev) =>
+        prev.map((task) =>
           task._id === taskId
             ? { ...task, status: currentTask.status }
             : task
@@ -53,25 +74,7 @@ const PriorityTasksPage = ({ priority }: { priority: TaskPriority }) => {
     }
   };
 
-    useEffect(() => {
-        const fetchTasks = async () => {
-            try {
-                setLoading(true);
-                const data = await getTasksByPriority(priority, page);
-                setTasks(data.tasks);
-                setTotalPages(data.totalPages);
-            } catch (err) {
-                console.error("Failed to fetch tasks", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchTasks();
-    }, [priority, page]);
-
-
-    return (
+  return (
     <div>
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
@@ -94,11 +97,12 @@ const PriorityTasksPage = ({ priority }: { priority: TaskPriority }) => {
         <p className="text-gray-500">Loading tasks...</p>
       )}
 
-      {/* Task Cards */}
+      {/* Empty */}
       {!loading && tasks.length === 0 && (
         <p className="text-gray-500">No tasks found.</p>
       )}
 
+      {/* Task Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         {tasks.map((task) => (
           <TaskCard
@@ -116,7 +120,8 @@ const PriorityTasksPage = ({ priority }: { priority: TaskPriority }) => {
           />
         ))}
       </div>
-            {/* Pagination */}
+
+      {/* Pagination */}
       <div className="flex justify-center items-center gap-4 mt-8">
         <button
           disabled={page === 1}
@@ -143,5 +148,3 @@ const PriorityTasksPage = ({ priority }: { priority: TaskPriority }) => {
 };
 
 export default PriorityTasksPage;
-
-
