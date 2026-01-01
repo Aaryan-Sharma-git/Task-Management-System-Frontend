@@ -18,7 +18,7 @@ This is the frontend application for the Task Management System, built with Reac
 ## Prerequisites
 
 - Node.js (v16 or higher)
-- npm or yarn
+- npm
 
 ## Installation
 
@@ -37,6 +37,7 @@ Create a `.env` file in the frontend root with the following sample format:
 
 ```
 VITE_API_URL=http://localhost:5000
+PAGINATION_LIMIT=5
 ```
 
 ## Running in Development
@@ -62,11 +63,12 @@ VITE_API_URL=http://localhost:5000
 
 ## Pages
 
-- **Login Page**: User authentication form.
-- **Register Page**: New user registration form.
-- **Priority Tasks Page**: Displays tasks filtered by priority (high, medium, low).
-- **Create Task Page**: Form for creating new tasks.
-- **Task Details Page**: View/edit individual task.
+- **Login**: User authentication form.
+- **Register**: New user registration form.
+- **MainLayout**: Layout wrapper for authenticated pages.
+- **PriorityTasksPage**: Displays tasks filtered by priority (high, medium, low).
+- **CreateTaskPage**: Form for creating new tasks.
+- **TaskDetailsPage**: View/edit individual task.
 
 ## Components
 
