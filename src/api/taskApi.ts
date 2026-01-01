@@ -11,7 +11,7 @@ interface TaskResponse {
 export const getTasksByPriority = async (
   priority: "high" | "medium" | "low",
   page: number,
-  limit: number = 5
+  limit: number = import.meta.env.PAGINATION_LIMIT
 ): Promise<TaskResponse> => {
   const res = await api.get(`/task/${priority}`, {
     params: { page, limit },
